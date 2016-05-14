@@ -120,6 +120,7 @@ function localAddresses() {
 function displayAddresses(addresses) {
     var lcd = require('jsupm_i2clcd');
     var display = new lcd.Jhd1313m1(0, 0x3E, 0x62);
+    display.setColor(128, 128, 128);
     
     if (addresses.wlan0) { 
         display.setCursor(1, 0);
