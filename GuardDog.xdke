@@ -15,8 +15,8 @@
         "name": "GuardDog.xdk"
       },
       "GuardDog.xdke": {
-        "previousModTime": 1463240891000,
-        "modified": 1463240891000,
+        "previousModTime": 1463249485000,
+        "modified": 1463249485000,
         "seen": true,
         "name": "GuardDog.xdke"
       },
@@ -33,8 +33,8 @@
         "name": "icon.png"
       },
       "main.js": {
-        "previousModTime": 1463240931000,
-        "modified": 1463240931000,
+        "previousModTime": 1463249563000,
+        "modified": 1463249563000,
         "seen": true,
         "name": "main.js"
       },
@@ -49,11 +49,17 @@
         "modified": 1463230898000,
         "seen": true,
         "name": "xdk/project-info.json"
+      },
+      ".gitignore": {
+        "previousModTime": 1463241605000,
+        "modified": 1463241605000,
+        "seen": true,
+        "name": ".gitignore"
       }
     },
     "boardFileStatus": {
       "main.js": {
-        "previousModTime": 1463240933926
+        "previousModTime": 1463249566586
       }
     }
   }

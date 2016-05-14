@@ -11,6 +11,8 @@
 // A3 - vibration sensor
 // I2C - LCD display
 
+// TODO load config from config.json
+
 var os = require('os');
 
 //MRAA Library was installed on the board directly through ssh session
@@ -25,10 +27,20 @@ var distInterrupter = require("jsupm_rfr359f");
 // This was tested on the Grove IR Distance Interrupter
 var myDistInterrupter = new distInterrupter.RFR359F(2);
 
+// Air quality sensor get samples using air.getSample(), higher number is worse
+var air = new (require("jsupm_gas").TP401)(1);
+var AIR_THRESHOLD = 150;
+
 // Create the LDT0-028 Piezo Vibration Sensor object using AIO pin 3
 var vibration = new sensorModule.LDT0028(3);
 // use vibration.getSample() to get sensor value
-var VIBRATION_THRESHOLD = 16;
+var VIBRATION_THRESHOLD = 20;
+
+var loudnessLib = require('jsupm_loudness');
+// Instantiate a Loudness sensor on analog pin A0, with an analog
+// reference voltage of 5.0
+var loudness = new loudnessLib.Loudness(0, 5.0);
+var LOUDNESS_THRESHOLD = 0.5; // 0.2 is conversion nearby
 
 //Buzzer connected to D6 connector
 var digital_pin_D6 = new mraa.Gpio(6);
@@ -111,39 +123,58 @@ function displayAddresses(addresses) {
     }
 }
 
-// The range appears to be about 4 inches, depending on adjustment
-var myInterval = setInterval(function()
+function isSecurityAlert(sensorValues) {
+    return sensorValues.proximityAlert ||
+        (sensorValues.noiseLevel > LOUDNESS_THRESHOLD) ||
+        (sensorValues.vibration > VIBRATION_THRESHOLD);
+}
+
+function isHealthAlert(sensorValues) {
+    return sensorValues.airQuality > AIR_THRESHOLD;
+}
+
+var alertCondition = false;
+
+// The IR interruptopr range appears to be about 4 inches, depending on adjustment
+var monitoringInterval = setInterval(function()
 {
-	if (myDistInterrupter.objectDetected()) {
-		console.log("Object detected");
+    var result = {}
+    result.proximityAlert = myDistInterrupter.objectDetected();
+    result.noiseLevel = loudness.loudness();
+    result.airQuality = air.getSample();
+    result.vibration = sampleVibration(10, 5);
+    
+    if (isSecurityAlert(result)) {
+        console.log("Security alert!", result);
+        alertCondition = true;
+    } else if (isHealthAlert(result)) {
+        console.log("Health alert!", result);
+        alertCondition = true;
+    } else {
+        if (alertCondition) {
+            alertCondition = false;
+            console.log("All clear :-)", result);
+        }
+    }
+    
+    if (alertCondition) {
+        // TODO RED LED
         // TODO re-enable buzzer
         //buzz();
     } else {
-		console.log("Area is clear");
+        // TODO GREEN LED
     }
 }, 100);
-// TODO enable IR detection
-clearInterval(myInterval);
-
-var vibrationInterval = setInterval(function()
-{
-    var sample = sampleVibration(20);
-    if (sample > VIBRATION_THRESHOLD) {
-        console.log("Vibration detected = "+sample);
-    } 
-}, 500);
-// TODO enable IR detection
-//clearInterval(vibrationInterval);
-
+//clearInterval(monitoringInterval);
 
 // When exiting: turn off LED, clear interval, and print message
 process.on('SIGINT', function()
 {
-	clearInterval(myInterval);
-    clearInterval(vibrationInterval);
+	clearInterval(monitoringInterval);
 	console.log("Exiting...");
     // ensure buzzer is off when stopping
     digital_pin_D6.write(0);
+    loudness.cleanup();
 	process.exit(0);
 });
 
