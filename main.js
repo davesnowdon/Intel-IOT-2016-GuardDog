@@ -5,6 +5,8 @@
 
 // Connect devices as follows
 // D2 - IR interrupter
+// D3 - red LED
+// D4 - green LED
 // D6 - buzzer
 // A0 - sound sensor
 // A1 - air quality
@@ -20,6 +22,7 @@ var mraa = require("mraa");
 
 // Load Grove module
 var sensorModule = require('jsupm_ldt0028');
+var groveSensor = require('jsupm_grove');
 
 var distInterrupter = require("jsupm_rfr359f");
 
@@ -47,6 +50,12 @@ var digital_pin_D6 = new mraa.Gpio(6);
 digital_pin_D6.dir(mraa.DIR_OUT);
 // start with buzz off
 digital_pin_D6.write(0);
+
+// red LED on D3
+var redLed = new groveSensor.GroveLed(3);
+
+// green LED on D4
+var greenLed = new groveSensor.GroveLed(4);
 
 console.log("This area is being guarded by K9 security");
 
@@ -158,12 +167,13 @@ var monitoringInterval = setInterval(function()
     }
     
     if (alertCondition) {
-        // TODO RED LED
+        redLed.on();
+        greenLed.off();
         // TODO re-enable buzzer
         //buzz();
     } else {
-        // TODO GREEN LED
-    }
+        redLed.off();
+        greenLed.on();    }
 }, 100);
 //clearInterval(monitoringInterval);
 
