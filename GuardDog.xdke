@@ -1,0 +1,60 @@
+{
+  "project": {
+    "projectSettingsVersion": "2.0.0",
+    "initialAutoPluginCount": 0,
+    "currentBuildConfiguration": "Android",
+    "projectFiles": {},
+    "projectDirectories": {}
+  },
+  "iot-tab": {
+    "fileStatus": {
+      "GuardDog.xdk": {
+        "previousModTime": 1463230898000,
+        "modified": 1463230898000,
+        "seen": true,
+        "name": "GuardDog.xdk"
+      },
+      "GuardDog.xdke": {
+        "previousModTime": 1463240891000,
+        "modified": 1463240891000,
+        "seen": true,
+        "name": "GuardDog.xdke"
+      },
+      "README.md": {
+        "previousModTime": 1463230897000,
+        "modified": 1463230897000,
+        "seen": true,
+        "name": "README.md"
+      },
+      "icon.png": {
+        "previousModTime": 1463230897000,
+        "modified": 1463230897000,
+        "seen": true,
+        "name": "icon.png"
+      },
+      "main.js": {
+        "previousModTime": 1463240931000,
+        "modified": 1463240931000,
+        "seen": true,
+        "name": "main.js"
+      },
+      "package.json": {
+        "previousModTime": 1463230897000,
+        "modified": 1463230897000,
+        "seen": true,
+        "name": "package.json"
+      },
+      "xdk/project-info.json": {
+        "previousModTime": 1463230898000,
+        "modified": 1463230898000,
+        "seen": true,
+        "name": "xdk/project-info.json"
+      }
+    },
+    "boardFileStatus": {
+      "main.js": {
+        "previousModTime": 1463240933926
+      }
+    }
+  }
+}
