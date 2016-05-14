@@ -16,6 +16,7 @@
 // TODO load config from config.json
 
 var os = require('os');
+var spawn = require('child_process').spawn;
 
 //MRAA Library was installed on the board directly through ssh session
 var mraa = require("mraa");
@@ -57,6 +58,16 @@ var redLed = new groveSensor.GroveLed(3);
 // green LED on D4
 var greenLed = new groveSensor.GroveLed(4);
 
+var PLAY_WAV_CMD = "/usr/bin/gst-launch-1.0 filesrc location= {filename} ! wavparse ! pulsesink";
+var SECURITY_ALERT_WAV = "/opt/soundfiles/obey1.wav";
+var HEALTH_ALERT_WAV = "/opt/soundfiles/obey1.wav";
+var ALL_CLEAR_WAV = undefined;
+
+var MIN_AUDIO_PLAY_INTERVAL = 20000;
+
+var alertCondition = false;
+var lastAudioPlay = new Date();
+
 console.log("This area is being guarded by K9 security");
 
 var localAddr = localAddresses();
@@ -70,6 +81,47 @@ function buzz() {
         //console.log("Buzz OFF!!!");
         digital_pin_D6.write(0);
     }, 500);
+}
+
+function runCmd(cmd, parameters, callback) {
+    console.log("RUN: ", cmd, parameters);
+    var proc = spawn(cmd, parameters);
+
+    proc.stdout.on('data', function(data) {
+        console.log('stdout: ', data);
+    }); 
+
+    proc.stderr.on('data', function(data) {
+        console.log('stderr: ', data);
+    });
+
+    proc.on('close', function(code) {
+        console.log('child process exited with code '+code);
+        if (callback) {
+            callback(code);
+        }
+    });
+}
+
+function playWav(filename) {
+    if (filename) {
+        var now = new Date();
+        if ((now.getTime() - lastAudioPlay.getTime()) > MIN_AUDIO_PLAY_INTERVAL) {
+            var cmdline = PLAY_WAV_CMD.replace("{filename}", filename);
+            //console.log("RUN: "+cmdline);
+            var c = cmdline.split(" ");
+            var cmd = c[0];
+            var params = c.slice(1);
+            // stop new audio when we start playing
+            lastAudioPlay = new Date();
+            runCmd(cmd, params, function(code) {
+                // add a further delay once the audio has stopped
+                lastAudioPlay = new Date();
+            });
+        } else {
+            console.log("Not playing audio, not enough time elapsed");
+        }
+    }
 }
 
 function sampleVibration(numSamples, delay) {
@@ -143,8 +195,6 @@ function isHealthAlert(sensorValues) {
     return sensorValues.airQuality > AIR_THRESHOLD;
 }
 
-var alertCondition = false;
-
 // The IR interruptopr range appears to be about 4 inches, depending on adjustment
 var monitoringInterval = setInterval(function()
 {
@@ -157,13 +207,16 @@ var monitoringInterval = setInterval(function()
     if (isSecurityAlert(result)) {
         console.log("Security alert!", result);
         alertCondition = true;
+        playWav(SECURITY_ALERT_WAV);
     } else if (isHealthAlert(result)) {
         console.log("Health alert!", result);
         alertCondition = true;
+        playWav(HEALTH_ALERT_WAV);
     } else {
         if (alertCondition) {
             alertCondition = false;
             console.log("All clear :-)", result);
+            playWav(ALL_CLEAR_WAV);
         }
     }
     
