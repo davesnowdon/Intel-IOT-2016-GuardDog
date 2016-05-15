@@ -1,12 +1,12 @@
 Edison Guard Dog Application
 ============================
 This application makes use of a number of grove sensors and actuators connected to the Edison including.
-* IR interruptor
-* sound (noise) sensor
-* air quality sensor
+* IR interruptor http://www.seeedstudio.com/wiki/Grove_-_IR_Distance_Interrupter_v1.2
+* sound (noise) sensor http://www.seeedstudio.com/wiki/Grove_-_Sound_Sensor
+* air quality sensor http://www.seeedstudio.com/wiki/Grove_-_Air_Quality_Sensor
 * LCD 2-line display with RGB backlight
 * red & green LEDs
-* vibration sensor
+* vibration sensor http://www.seeedstudio.com/wiki/Grove_-_Piezo_Vibration_Sensor
 
 The application also makes use of a Bluetooth connnected speaker. Any speaker should work, but this one (a Bluetooth controlled K9) was used to make the application more visually interesting: http://www.ebay.co.uk/itm/381567203632?_trksid=p2060353.m1438.l2649&ssPageName=STRK%3AMEBIDX%3AIT
 
