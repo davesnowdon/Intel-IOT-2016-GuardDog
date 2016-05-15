@@ -15,6 +15,10 @@
 
 // TODO load config from config.json
 
+var USE_WRAPPER_SCRIPT = false;
+var ENABLE_PROXIMITY = true;
+var ENABLE_AUDIO_ALERT = false;
+
 var os = require('os');
 var spawn = require('child_process').spawn;
 
@@ -58,10 +62,18 @@ var redLed = new groveSensor.GroveLed(3);
 // green LED on D4
 var greenLed = new groveSensor.GroveLed(4);
 
-var PLAY_WAV_CMD = "/usr/bin/gst-launch-1.0 filesrc location= {filename} ! wavparse ! pulsesink";
-var SECURITY_ALERT_WAV = "/opt/soundfiles/obey1.wav";
-var HEALTH_ALERT_WAV = "/opt/soundfiles/obey1.wav";
-var ALL_CLEAR_WAV = undefined;
+var PLAY_WAV_CMD = undefined;
+if (USE_WRAPPER_SCRIPT) {
+    // the wrapper script runs this command (twice)
+    //var PLAY_WAV_CMD = "/usr/bin/gst-launch-1.0 filesrc location= {filename} ! wavparse ! pulsesink";
+    // TODO upload script as paty of XDK upload when know how to locate in filesystem (project current directory)
+    PLAY_WAV_CMD = "/bin/sh /opt/soundfiles/playwav2.sh {filename}";
+} else {
+    PLAY_WAV_CMD = "/usr/bin/gst-launch-1.0 filesrc location= {filename} ! wavparse ! pulsesink";
+}
+var SECURITY_ALERT_WAV = "/opt/soundfiles/intruder.wav";
+var HEALTH_ALERT_WAV = "/opt/soundfiles/air-quality.wav";
+var ALL_CLEAR_WAV = "/opt/soundfiles/no-problems-detected.wav";
 
 var MIN_AUDIO_PLAY_INTERVAL = 20000;
 
@@ -199,7 +211,11 @@ function isHealthAlert(sensorValues) {
 var monitoringInterval = setInterval(function()
 {
     var result = {}
-    result.proximityAlert = myDistInterrupter.objectDetected();
+    if (ENABLE_PROXIMITY) {
+        result.proximityAlert = myDistInterrupter.objectDetected();
+    } else {
+        result.proximityAlert = false;
+    }
     result.noiseLevel = loudness.loudness();
     result.airQuality = air.getSample();
     result.vibration = sampleVibration(10, 5);
@@ -207,16 +223,22 @@ var monitoringInterval = setInterval(function()
     if (isSecurityAlert(result)) {
         console.log("Security alert!", result);
         alertCondition = true;
-        playWav(SECURITY_ALERT_WAV);
+        if (ENABLE_AUDIO_ALERT) {
+            playWav(SECURITY_ALERT_WAV);
+        }
     } else if (isHealthAlert(result)) {
         console.log("Health alert!", result);
         alertCondition = true;
-        playWav(HEALTH_ALERT_WAV);
+        if (ENABLE_AUDIO_ALERT) {
+            playWav(HEALTH_ALERT_WAV);
+        }
     } else {
         if (alertCondition) {
             alertCondition = false;
             console.log("All clear :-)", result);
-            playWav(ALL_CLEAR_WAV);
+            if (ENABLE_AUDIO_ALERT) {
+                playWav(ALL_CLEAR_WAV);
+            }
         }
     }
     
