@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 import javax.inject.Named;
 //[END begin]
- //[START api_def]
+//[START api_def]
 
 /**
- * Defines v1 of a helloworld API, which provides simple "greeting" methods.
+ * Defines v1 of a simple API representing an alarm state and whether it is armed
  */
-@Api(name = "helloworld",
+@Api(name = "guarddog",
     version = "v1",
     scopes = {Constants.EMAIL_SCOPE},
     clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID, Constants.IOS_CLIENT_ID},
@@ -24,46 +24,21 @@ import javax.inject.Named;
 )
 public class Greetings {
 
-  public static ArrayList<HelloGreeting> greetings = new ArrayList<HelloGreeting>();
+  public static AlarmState alarmState = new AlarmState(false);
 
-  static {
-    greetings.add(new HelloGreeting("hello world!"));
-    greetings.add(new HelloGreeting("goodbye world!"));
-  }
 //[END api_def]
-//[START getgreetings]
+//[START armed]
 
-  public HelloGreeting getGreeting(@Named("id") Integer id) throws NotFoundException {
-    try {
-      return greetings.get(id);
-    } catch (IndexOutOfBoundsException e) {
-      throw new NotFoundException("Greeting not found with an index: " + id);
-    }
+  public AlarmState getAlarmState() throws NotFoundException {
+      return alarmState;
   }
+//[END armed]
+//[START arm]
 
-  public ArrayList<HelloGreeting> listGreeting() {
-    return greetings;
+  @ApiMethod(httpMethod = "post")
+  public AlarmState setAlarmState(AlarmState greeting) {
+    alarmState = greeting;
+    return alarmState;
   }
-//[END getgreetings]
-//[START multiplygreetings]
-
-  @ApiMethod(name = "greetings.multiply", httpMethod = "post")
-  public HelloGreeting insertGreeting(@Named("times") Integer times, HelloGreeting greeting) {
-    HelloGreeting response = new HelloGreeting();
-    StringBuilder responseBuilder = new StringBuilder();
-    for (int i = 0; i < times; i++) {
-      responseBuilder.append(greeting.getMessage());
-    }
-    response.setMessage(responseBuilder.toString());
-    return response;
-  }
-//[END multiplygreetings]
-//[START auth] 
-
-  @ApiMethod(name = "greetings.authed", path = "hellogreeting/authed")
-  public HelloGreeting authedGreeting(User user) {
-    HelloGreeting response = new HelloGreeting("hello " + user.getEmail());
-    return response;
-  }
-//[END auth]
+//[END arm]
 }
