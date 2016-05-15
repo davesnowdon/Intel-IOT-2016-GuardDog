@@ -1,46 +1,33 @@
-Blank Node.js IoT App
+Edison Guard Dog Application
 ============================
-The Blank Node.js sample application distributed within Intel® XDK IoT Edition under the Internet of Things  project creation option.
+This application makes use of a number of grove sensors and actuators connected to the Edison including.
+* IR interruptor
+* sound (noise) sensor
+* air quality sensor
+* LCD 2-line display with RGB backlight
+* red & green LEDs
+* vibration sensor
 
-Intel(R) XDK IoT Edition
--------------------------------------------
-This template is part of the Intel(R) XDK IoT Edition. 
-Download the Intel(R) XDK IoT Edition at https://software.intel.com/en-us/html5/xdk-iot. To see the technical details of the sample, 
-please visit the sample article page at https://software.intel.com/en-us/xdk/docs/intel-xdk-iot-edition-nodejs-templates.
+The application also makes use of a Bluetooth connnected speaker. Any speaker should work, but this one (a Bluetooth controlled K9) was used to make the application more visually interesting: http://www.ebay.co.uk/itm/381567203632?_trksid=p2060353.m1438.l2649&ssPageName=STRK%3AMEBIDX%3AIT
+
+Reverse engineering the K9's Bluetooth protocol to allow the Edison to make the K9 robot move would be a nice feature to add in future.
+
+The Edison part of the application is built using Intel's XDK IoT Edition IDE
 
 
-Important App Files
----------------------------
-* main.js
-* package.json
-* icon.png
-* README.md
+Connecting the Bluetooth speaker to Edison
+------------------------------------------
+Replace 00:58:50:00:08:21 with the address of your speaker (which can be discovered using the "scan on" command of bluetoothctl
 
-License Information Follows
----------------------------
-Copyright (c) 2014, Intel Corporation. All rights reserved.
+    rfkill unblock bluetooth
+    bluetoothctl
+    # run the following commands inside bluetoothctl
+    scan on
+    pair 00:58:50:00:08:21
+    connect 00:58:50:00:08:21
+    quit
 
-Redistribution and use in source and binary forms, with or without modification, 
-are permitted provided that the following conditions are met:
+    # use pactl to find the speaker and make the the default
+    pactl list sinks
+    pactl set-default-sink bluez_sink.00_58_50_00_08_21
 
-- Redistributions of source code must retain the above copyright notice, 
-  this list of conditions and the following disclaimer.
-
-- Redistributions in binary form must reproduce the above copyright notice, 
-  this list of conditions and the following disclaimer in the documentation 
-  and/or other materials provided with the distribution.
-
-- Neither the name of Intel Corporation nor the names of its contributors 
-  may be used to endorse or promote products derived from this software 
-  without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
-OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
